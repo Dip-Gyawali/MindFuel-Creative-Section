@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('../partials/head.ejs') %>
+
+<body>
+    <%- include('../partials/nav.ejs') %>
+
+    <div class="blogs content">
+        <h2>All Posts</h2>
+        <% if (blogs.length > 0) { %>
+            <% blogs.forEach(blog => { %>
+                <div class="blog-post">
+                    <a class="single" href="/blogs/<%= blog.id %>">
+                        <h3 class="title"><%= blog.title %></h3>
+                        <p class="snippet"><%= blog.snippet %></p>
+                    </a>
+                    <div class="like-section">
+                        <button class="like-button" data-blog-id="<%= blog.id %>">Like</button>
+                        <span class="like-count" id="like-count-<%= blog.id %>"><%= blog.likes %></span>
+                    </div>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <p>There is no post to display</p>
+        <% } %>
+    </div>
+
+    <%- include('../partials/footer.ejs') %>
+
+    <script>
+        document.querySelectorAll('.like-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const blogId = button.getAttribute('data-blog-id');
+    
+                // Send a request to the server to update the like count
+                fetch(`/blogs/${blogId}/like`, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const likeCount = document.getElementById(`like-count-${blogId}`);
+                        likeCount.textContent = data.likes;
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
